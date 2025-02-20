@@ -1,9 +1,10 @@
 import React, { useContext } from "react";
 import { Link, useNavigate } from "react-router";
 import { AuthContext } from "../../Provider/AuthProvider";
+import Swal from "sweetalert2";
 
 const Register = () => {
-  const { createUser } = useContext(AuthContext);
+  const { createUser, updateUserProfile } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const handleSubmit = (e) => {
@@ -16,7 +17,21 @@ const Register = () => {
     createUser(email, password).then((result) => {
       const loggedUser = result.user;
       console.log(loggedUser);
-      alert("Sing Up Successfully Done");
+      updateUserProfile(loggedUser, name)
+        .then(() => {
+          console.log("user prof info updated");
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+      Swal.fire({
+        position: "top-end",
+        icon: "success",
+        title: "Registration Successful",
+        showConfirmButton: false,
+        timer: 1500,
+      });
+      form.reset();
       navigate("/");
     });
   };
