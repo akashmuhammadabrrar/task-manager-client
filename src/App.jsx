@@ -11,7 +11,13 @@ function App() {
   return (
     <Routes>
       <Route path="/" element={<Root></Root>}>
-        <Route index element={<Home></Home>}></Route>
+        <Route
+          index
+          element={
+            <PrivetRoute>
+              <Home></Home>
+            </PrivetRoute>
+          }></Route>
         <Route path="/login" element={<Login></Login>}></Route>
         <Route path="/register" element={<Register></Register>}></Route>
         <Route
@@ -21,7 +27,6 @@ function App() {
               <Tasks></Tasks>
             </PrivetRoute>
           }></Route>
-        <Route path="/update/:id" element={<TaskItem></TaskItem>}></Route>
       </Route>
     </Routes>
   );

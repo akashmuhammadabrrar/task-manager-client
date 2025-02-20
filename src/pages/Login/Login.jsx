@@ -33,7 +33,7 @@ const Login = () => {
       <div className="hero bg-base-200 min-h-screen">
         <div className="hero-content flex-col lg:flex-row-reverse">
           <div className="text-center lg:text-left">
-            <h1 className="text-5xl font-bold">Login now!</h1>
+            <h1 className="text-5xl font-bold">Login First Please!</h1>
             <p className="py-6 text-justify">
               If You Are New Here Then Login First With Your Email And Password.
               Or Sign In With Your Google Account Please.
