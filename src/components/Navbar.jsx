@@ -34,9 +34,9 @@ const Navbar = () => {
 
   return (
     <div className="navbar bg-base-300 shadow-sm">
-      <a className="btn btn-ghost text-xl">Task+To_Do</a>
+      <a className="btn btn-ghost text-xl">TaskNow</a>
 
-      <ul className="navbar-end flex navbar items-center gap-4">
+      <ul className="navbar-end flex navbar items-center gap-4 ml-16">
         <li>
           <button
             className={`btn ${
@@ -80,6 +80,15 @@ const Navbar = () => {
               </button>
             </li>
           </>
+        )}
+        {user ? (
+          <>
+            <p className="text-xl font-semibold border p-1">
+              {user?.displayName}
+            </p>
+          </>
+        ) : (
+          <></>
         )}
       </ul>
     </div>

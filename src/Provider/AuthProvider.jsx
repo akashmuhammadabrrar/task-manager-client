@@ -2,8 +2,10 @@ import React, { createContext, useEffect, useState } from "react";
 import {
   createUserWithEmailAndPassword,
   getAuth,
+  GoogleAuthProvider,
   onAuthStateChanged,
   signInWithEmailAndPassword,
+  signInWithPopup,
   signOut,
   updateProfile,
 } from "firebase/auth";
@@ -15,6 +17,7 @@ const auth = getAuth(app);
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const googleProvider = new GoogleAuthProvider();
 
   // Create a user
   const createUser = (email, password) => {
@@ -26,6 +29,12 @@ const AuthProvider = ({ children }) => {
   const signin = (email, password) => {
     setLoading(true);
     return signInWithEmailAndPassword(auth, email, password); // <-- Missing auth instance added
+  };
+
+  //   google signin
+  const googleSingIn = () => {
+    setLoading(true);
+    return signInWithPopup(auth, googleProvider);
   };
 
   // Logout
@@ -59,6 +68,7 @@ const AuthProvider = ({ children }) => {
     signin,
     logOut,
     updateUserProfile,
+    googleSingIn,
   };
 
   return (
