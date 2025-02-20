@@ -1,6 +1,7 @@
 import React from "react";
 import { Outlet } from "react-router";
 import Navbar from "../components/Navbar";
+import Login from "../pages/Login/Login";
 
 const Root = () => {
   return (
