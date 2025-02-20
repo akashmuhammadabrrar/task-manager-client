@@ -1,9 +1,21 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { Link, useLocation } from "react-router";
+import { AuthContext } from "../Provider/AuthProvider";
 
 const Navbar = () => {
+  const { user, logOut } = useContext(AuthContext);
   const [activeButton, setActiveButton] = useState("");
   const location = useLocation();
+
+  const handleLogOut = () => {
+    logOut()
+      .then(() => {
+        alert("Logout Successful");
+      })
+      .catch((error) => {
+        console.log(error, "Logout Error");
+      });
+  };
 
   const handleButtonClick = (buttonName) => {
     setActiveButton(buttonName);
@@ -40,17 +52,28 @@ const Navbar = () => {
             <Link to={"/about"}>About</Link>
           </button>
         </li>
-        <li>
-          <button
-            className={`btn ${
-              activeButton === "login"
-                ? "bg-gray-800 text-white"
-                : "bg-transparent text-black"
-            }`}
-            onClick={() => handleButtonClick("login")}>
-            <Link to={"/login"}>Login</Link>
-          </button>
-        </li>
+
+        {user ? (
+          <>
+            <button onClick={handleLogOut} className="btn btn-error">
+              Logout
+            </button>
+          </>
+        ) : (
+          <>
+            <li>
+              <button
+                className={`btn ${
+                  activeButton === "login"
+                    ? "bg-gray-800 text-white"
+                    : "bg-transparent text-black"
+                }`}
+                onClick={() => handleButtonClick("login")}>
+                <Link to={"/login"}>Login</Link>
+              </button>
+            </li>
+          </>
+        )}
       </ul>
     </div>
   );
