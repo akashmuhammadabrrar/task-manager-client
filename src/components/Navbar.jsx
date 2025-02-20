@@ -1,12 +1,10 @@
-import React, { useContext, useState } from "react";
-import { Link, useLocation } from "react-router";
+import React, { useContext } from "react";
+import { Link } from "react-router";
 import { AuthContext } from "../Provider/AuthProvider";
 import Swal from "sweetalert2";
 
 const Navbar = () => {
   const { user, logOut } = useContext(AuthContext);
-  const [activeButton, setActiveButton] = useState("");
-  const location = useLocation();
 
   const handleLogOut = () => {
     logOut()
@@ -24,39 +22,19 @@ const Navbar = () => {
       });
   };
 
-  const handleButtonClick = (buttonName) => {
-    setActiveButton(buttonName);
-  };
-
-  React.useEffect(() => {
-    setActiveButton("");
-  }, [location.pathname]);
-
   return (
     <div className="navbar bg-base-300 shadow-sm">
       <a className="btn btn-ghost text-xl">TaskNow</a>
 
       <ul className="navbar-end flex navbar items-center gap-4 ml-16">
         <li>
-          <button
-            className={`btn ${
-              activeButton === "home"
-                ? "bg-gray-800 text-white"
-                : "bg-transparent text-black"
-            }`}
-            onClick={() => handleButtonClick("home")}>
+          <button className="btn bg-transparent text-black">
             <Link to={"/"}>Home</Link>
           </button>
         </li>
         <li>
-          <button
-            className={`btn ${
-              activeButton === "about"
-                ? "bg-gray-800 text-white"
-                : "bg-transparent text-black"
-            }`}
-            onClick={() => handleButtonClick("about")}>
-            <Link to={"/about"}>About</Link>
+          <button className="btn bg-transparent text-black">
+            <Link to={"/tasks"}>Tasks</Link>
           </button>
         </li>
 
@@ -69,13 +47,7 @@ const Navbar = () => {
         ) : (
           <>
             <li>
-              <button
-                className={`btn ${
-                  activeButton === "login"
-                    ? "bg-gray-800 text-white"
-                    : "bg-transparent text-black"
-                }`}
-                onClick={() => handleButtonClick("login")}>
+              <button className="btn bg-transparent text-black">
                 <Link to={"/login"}>Login</Link>
               </button>
             </li>
