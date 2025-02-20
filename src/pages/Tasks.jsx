@@ -1,56 +1,3 @@
-// import React, { useState, useEffect } from "react";
-// import useAxios from "../hooks/useAxios";
-// import { format } from "date-fns";
-
-// const Tasks = () => {
-//   const axios = useAxios();
-//   const [tasks, setTasks] = useState([]);
-
-//   useEffect(() => {
-//     axios
-//       .get("/tasks")
-//       .then((res) => setTasks(res.data))
-//       .catch((err) => console.error("Error fetching tasks:", err));
-//   }, [axios]);
-
-//   return (
-//     <div className="container mx-auto mt-10">
-//       <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl text-center font-semibold">
-//         All Tasks I Added
-//       </h2>
-//       <div className="mt-4">
-//         {/* Render task list */}
-//         {tasks.length > 0 ? (
-//           tasks.map((task) => (
-//             <div
-//               key={task._id}
-//               className="border w-[40%] mx-auto p-4 my-2 bg-gray-100 rounded-lg shadow-md">
-//               <h3 className="font-bold text-lg">{task.title}</h3>
-//               <p className="text-gray-700">{task.description}</p>
-
-//               {/* Display formatted due date */}
-//               <p className="text-sm text-gray-500 mt-2">
-//                 <strong>Due Date:</strong>{" "}
-//                 {task.dueDate
-//                   ? format(new Date(task.dueDate), "EEEE, MMMM d, yyyy hh:mm a")
-//                   : "No Due Date"}
-//               </p>
-
-//               <p className="text-sm text-gray-900 font-bold bg-blue-100 inline-block px-2 py-1 mt-2 rounded">
-//                 {task.category}
-//               </p>
-//             </div>
-//           ))
-//         ) : (
-//           <p className="text-center text-gray-500">No tasks found</p>
-//         )}
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default Tasks;
-
 import React, { useState, useEffect } from "react";
 import useAxios from "../hooks/useAxios";
 import { format } from "date-fns";
@@ -66,6 +13,8 @@ const Tasks = () => {
   const axios = useAxios();
   const [tasks, setTasks] = useState([]);
   const [activeId, setActiveId] = useState(null);
+  const [editingTask, setEditingTask] = useState(null); // Track the task being edited
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false); // Control modal visibility
 
   useEffect(() => {
     fetchTasks();
@@ -123,9 +72,42 @@ const Tasks = () => {
   };
 
   const handleEdit = (taskId) => {
-    // Add your edit logic here
-    console.log("Edit task with ID:", taskId);
-    // Example: Open a modal or navigate to an edit page
+    // Find the task to edit
+    const taskToEdit = tasks.find((task) => task._id === taskId);
+    if (taskToEdit) {
+      setEditingTask(taskToEdit); // Set the task to edit
+      setIsEditModalOpen(true); // Open the edit modal
+    }
+  };
+
+  const handleEditSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      // Create a copy of the editingTask object and remove the _id field
+      const { _id, ...updatedTask } = editingTask;
+
+      const response = await axios.put(`/tasks/${_id}`, updatedTask);
+      if (response.data.modifiedCount === 1) {
+        // Update the task in the state
+        setTasks(
+          tasks.map((task) =>
+            task._id === _id ? { ...task, ...updatedTask } : task
+          )
+        );
+        Swal.fire({
+          position: "top-end",
+          icon: "success",
+          title: "Task Updated Successfully",
+          showConfirmButton: false,
+          timer: 1500,
+        });
+        setIsEditModalOpen(false); // Close the modal
+      } else {
+        console.error("Task not found or update failed");
+      }
+    } catch (err) {
+      console.error("Error updating task:", err);
+    }
   };
 
   const DraggableTask = ({ task }) => {
@@ -201,6 +183,97 @@ const Tasks = () => {
           </DroppableArea>
         </div>
       </div>
+
+      {/* Edit Modal */}
+      {isEditModalOpen && editingTask && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-11/12 max-w-md">
+            <h2 className="text-xl font-bold mb-4">Edit Task</h2>
+            <form onSubmit={handleEditSubmit}>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700">
+                  Title
+                </label>
+                <input
+                  type="text"
+                  value={editingTask?.title || ""}
+                  onChange={(e) =>
+                    setEditingTask({ ...editingTask, title: e.target.value })
+                  }
+                  className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+                  required
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700">
+                  Description
+                </label>
+                <textarea
+                  value={editingTask?.description || ""}
+                  onChange={(e) =>
+                    setEditingTask({
+                      ...editingTask,
+                      description: e.target.value,
+                    })
+                  }
+                  className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+                  required
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700">
+                  Due Date
+                </label>
+                <input
+                  type="datetime-local"
+                  value={
+                    editingTask?.dueDate
+                      ? new Date(editingTask.dueDate).toISOString().slice(0, 16)
+                      : ""
+                  }
+                  onChange={(e) =>
+                    setEditingTask({
+                      ...editingTask,
+                      dueDate: new Date(e.target.value),
+                    })
+                  }
+                  className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700">
+                  Category
+                </label>
+                <select
+                  name="category"
+                  value={editingTask?.category || ""}
+                  onChange={(e) =>
+                    setEditingTask({ ...editingTask, category: e.target.value })
+                  }
+                  className="border p-2 w-full rounded-md">
+                  <option value="To-Do">To-Do</option>
+                  <option value="In Progress">In Progress</option>
+                  <option value="Done">Done</option>
+                </select>
+              </div>
+              <div className="flex justify-end space-x-2">
+                <button
+                  type="button"
+                  onClick={() => setIsEditModalOpen(false)}
+                  className="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600">
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">
+                  Save Changes
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       <DragOverlay>
         {activeTask ? (
           <div className="border p-4 bg-gray-100 rounded-lg shadow-md">

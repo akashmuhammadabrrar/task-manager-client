@@ -5,6 +5,7 @@ import Login from "./pages/Login/Login";
 import Register from "./pages/Login/Register";
 import Tasks from "./pages/Tasks";
 import PrivetRoute from "./routes/PrivetRoute";
+import TaskItem from "./pages/TaskItem";
 
 function App() {
   return (
@@ -13,7 +14,6 @@ function App() {
         <Route index element={<Home></Home>}></Route>
         <Route path="/login" element={<Login></Login>}></Route>
         <Route path="/register" element={<Register></Register>}></Route>
-
         <Route
           path="/tasks"
           element={
@@ -21,6 +21,7 @@ function App() {
               <Tasks></Tasks>
             </PrivetRoute>
           }></Route>
+        <Route path="/update/:id" element={<TaskItem></TaskItem>}></Route>
       </Route>
     </Routes>
   );
