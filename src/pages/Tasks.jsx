@@ -60,6 +60,7 @@ import {
   useDroppable,
   DragOverlay,
 } from "@dnd-kit/core";
+import Swal from "sweetalert2";
 
 const Tasks = () => {
   const axios = useAxios();
@@ -67,11 +68,17 @@ const Tasks = () => {
   const [activeId, setActiveId] = useState(null);
 
   useEffect(() => {
-    axios
-      .get("/tasks")
-      .then((res) => setTasks(res.data))
-      .catch((err) => console.error("Error fetching tasks:", err));
-  }, [axios]);
+    fetchTasks();
+  }, []);
+
+  const fetchTasks = async () => {
+    try {
+      const response = await axios.get("/tasks");
+      setTasks(response.data);
+    } catch (err) {
+      console.error("Error fetching tasks:", err);
+    }
+  };
 
   const handleDragStart = (event) => {
     setActiveId(event.active.id);
@@ -92,6 +99,33 @@ const Tasks = () => {
     }
 
     setActiveId(null);
+  };
+
+  const handleDelete = async (taskId) => {
+    try {
+      const response = await axios.delete(`/tasks/${taskId}`);
+      if (response.data.deletedCount === 1) {
+        // Remove the deleted task from the state
+        setTasks(tasks.filter((task) => task._id !== taskId));
+        Swal.fire({
+          position: "top-end",
+          icon: "success",
+          title: "Task Deleted Successfully",
+          showConfirmButton: false,
+          timer: 1500,
+        });
+      } else {
+        console.error("Task not found or already deleted");
+      }
+    } catch (err) {
+      console.error("Error deleting task:", err);
+    }
+  };
+
+  const handleEdit = (taskId) => {
+    // Add your edit logic here
+    console.log("Edit task with ID:", taskId);
+    // Example: Open a modal or navigate to an edit page
   };
 
   const DraggableTask = ({ task }) => {
@@ -116,6 +150,21 @@ const Tasks = () => {
         <p className="text-sm text-gray-900 font-bold bg-blue-100 inline-block px-2 py-1 mt-2 rounded">
           {task.category}
         </p>
+        {/* Buttons for Delete and Edit */}
+        <div className="flex justify-start space-x-2 mt-4">
+          <button
+            onPointerDown={(e) => e.stopPropagation()} // Prevent drag on button click
+            onClick={() => handleEdit(task._id)}
+            className="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600 cursor-pointer">
+            Edit
+          </button>
+          <button
+            onPointerDown={(e) => e.stopPropagation()} // Prevent drag on button click
+            onClick={() => handleDelete(task._id)}
+            className="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600 cursor-pointer">
+            Delete
+          </button>
+        </div>
       </div>
     );
   };
@@ -128,7 +177,7 @@ const Tasks = () => {
     return (
       <div
         ref={setNodeRef}
-        className=" grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {children}
       </div>
     );

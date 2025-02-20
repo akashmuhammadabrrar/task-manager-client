@@ -88,6 +88,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { format } from "date-fns";
 import useAxios from "../hooks/useAxios";
+import Swal from "sweetalert2";
 
 const TaskBoard = () => {
   const axios = useAxios();
@@ -123,7 +124,13 @@ const TaskBoard = () => {
 
       const response = await axios.post("/tasks", formattedTask);
       console.log("Task added successfully:", response.data);
-      alert("Task added successfully!");
+      Swal.fire({
+        position: "top-end",
+        icon: "success",
+        title: "Task Added Successfully",
+        showConfirmButton: false,
+        timer: 1500,
+      });
 
       // Clear form after submission
       setTask({
